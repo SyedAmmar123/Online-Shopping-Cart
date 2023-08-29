@@ -1,0 +1,39 @@
+﻿@{
+    ViewData["Title"] = "Vue";
+    Layout = "_AdminLayout";
+}
+
+<!-- step 03 -->
+<div id="app3">
+    <input type="text" v-model="msg" />
+</div>
+
+@section js{
+    <script>
+        var app = Vue.createApp({
+            data() {
+                return {
+                    msg: ''
+                }
+            },
+            methods:{
+                
+            },
+            created(){
+                console.log('created');
+            },
+            updated(){
+                console.log('updated');
+            },
+            mounted(){
+                console.log('mounted');
+            },
+            watch:{
+                "msg" : function(nv, ov){
+                    console.log('new value: ' + nv);
+                    console.log('old value: ' + ov);
+                }
+            }
+        }).mount('#app3');
+    </script>
+}

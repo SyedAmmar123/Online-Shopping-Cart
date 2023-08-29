@@ -1,0 +1,143 @@
+﻿﻿@{
+    ViewData["Title"] = "Index";
+}
+
+<div class="cart_section" id="cartApp" style="background-color: #d4e6e6;">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-10 offset-lg-1">
+                <div class="cart_container">
+                    <h1 class="cart_title">Shopping Cart</h1>
+                    <template v-if="loaders.cart">
+                        <span class="fa fa-spin fa-spinner fa-3x"></span>
+                    </template>
+                    <template v-if="cartList.length">
+                        <div class="cart_items">
+                            <ul class="cart_list">
+                                <li class="cart_item clearfix" v-for="ci in cartList" style="background-color: white; padding-left: 10px;">
+
+                                    <div class="cart_item_image "><img style="height:50px;" :src="`/${ci.imageUrl}`" alt=""></div>
+                                    <div class="cart_item_info d-flex flex-md-row flex-column justify-content-between">
+                                        <div class="cart_item_name cart_info_col ">
+                                            <div class="cart_item_title  d-inline">{{ci.categoryName}}</div>
+                                            <div class="cart_item_text d-inline">{{ci.name}}</div>
+                                        </div>
+                                        <div class="cart_item_quantity cart_info_col d-inline">
+                                            <div class="cart_item_title">Quantity</div>
+                                            <div class="cart_item_text ">
+                                                <input type="number" style="width:80px;" v-model="ci.qty" class="form-control p-1" :disabled="!ci.editMode" />
+                                            </div>
+                                        </div>
+                                        <div class="cart_item_price cart_info_col">
+                                            <div class="cart_item_title">Unit Price</div>
+                                            <div class="cart_item_text ">Rs. {{ci.price}}</div>
+                                        </div>
+                                        <div class="cart_item_total cart_info_col">
+                                            <div class="cart_item_title ">Total Price</div>
+                                            <div class="cart_item_text ">Rs. {{ci.price * ci.qty}}</div>
+                                        </div>
+
+                                        <div class="cart_item_total cart_info_col text-right mt-3">
+                                            <template v-if="!ci.loader">
+                                                <span @@click="updateCart(ci)" v-if="ci.editMode" class="fa fa-save fa-2x text-info"></span>
+                                                <span @@click="ci.editMode = true" v-else class="fa fa-edit fa-2x text-info"></span>
+                                                &nbsp;
+                                                <span v-if="!ci.deleteMode" class="fa-solid fa-trash fa-2x text-danger" @@click="ci.deleteMode = true"></span>
+                                                <span v-else class="fa fa-trash fa-2x text-danger" @@click="deleteItem(ci)"></span>
+
+                                            </template>
+                                            <template v-else>
+                                                <span class="fa fa-spin fa-spinner fa-2x text-info"></span>
+                                            </template>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="order_total">
+                            <div class="order_total_content text-md-right">
+                                <h4 class="order_total_title">Order Total:</h4>
+                                <h4 class="order_total_amount">
+                                    Rs. {{cartList.map(m => m.qty * m.price).reduce((a,b) => a+b, 0)}}
+                                </h4>
+                            </div>
+                        </div>
+                    </template>
+                    <template v-else>
+                        <h3>No items in cart</h3>
+                    </template>
+                    <div class="cart_buttons">
+                        <a href="/Checkout" class="button cart_button_clear btn btn-success">Checkout</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section js{
+    <script>
+        var cartApp = Vue.createApp({
+            data() {
+                return {
+                    cartList: [],
+                    loaders: {
+                        cart: true
+                    }
+                }
+            },
+            methods: {
+                addToCart: function (id) {
+                    if (!this.isLoggedIn) {
+                        window.location.assign('/login');
+                    }
+                    $.post('/Cart/AddOrUpdateCart', { id: id }, function (res) {
+                        if (res.status) {
+                            cartApp.cartList = res.data;
+                        }
+                    });
+                },
+                loadCart: function () {
+                    this.loaders.cart = true;
+                    $.post('/Cart/GetCartItems', function (res) {
+                        if (res.status) {
+                            res.data.forEach(m => m.loader = false);
+                            res.data.forEach(m => m.editMode = false);
+                            res.data.forEach(m => m.deleteMode = false);
+                            cartApp.cartList = res.data;
+                            cartApp.loaders.cart = false;
+                        }
+                    });
+                },
+                updateCart: function (ci) {
+                    ci.editMode = false;
+                    ci.loader = true;
+                    $.post('/Cart/AddOrUpdateCart', { id: ci.productId, qty: ci.qty, isUpdate: true }, function (res) {
+                        if (res.status) {
+                            res.data.forEach(m => m.loader = false);
+                            res.data.forEach(m => m.editMode = false);
+                            cartApp.cartList = res.data;
+                        }
+                    })
+                },
+                deleteItem: function (ci) {
+                    ci.loader = true;
+                    $.post('/Cart/DeleteItem', { id: ci.productId }, function (res) {
+                        if (res.status) {
+                            cartApp.cartList = cartApp.cartList.filter(m => m.productId != ci.productId);
+                        }
+                    })
+                }
+            },
+            created() {
+                this.loadCart();
+                console.log('created')
+            },
+            updated() {
+                console.log('updated')
+            }
+        }).mount('#cartApp');
+    </script>
+}

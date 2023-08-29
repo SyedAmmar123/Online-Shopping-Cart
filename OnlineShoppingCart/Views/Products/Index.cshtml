@@ -1,0 +1,99 @@
+﻿@model IEnumerable<OnlineShoppingCart.Models.ProductViewModel>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+
+<div class="card">
+    <div class="card-body">
+        <h4 class="card-title">
+            Creating new Category
+
+            <a asp-action="Create" class="btn btn-info btn-sm float-right">
+                <i class="fa fa-plus"></i>
+                Create New
+            </a>
+        </h4>
+        <p class="card-description">
+            Setup Section
+        </p>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Slug)
+                    </th>
+                    @*<th>
+                        @Html.DisplayNameFor(model => model.Name)
+                    </th>*@
+                    @* <th>
+                    @Html.DisplayNameFor(model => model.Description)
+                    </th>*@
+                    <th>
+                        @Html.DisplayNameFor(model => model.Price)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Brand)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Stock)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.ReleaseDate)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Category)
+                    </th>
+
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Slug)
+                            <img src="/@item.ImageUrl" class=" img-thumbnail img-fluid" style="width: 50px;" />
+                        </td>
+                       @* <td>
+                            @Html.DisplayFor(modelItem => item.Name)
+                        </td>*@
+                        @* <td>
+                    @Html.DisplayFor(modelItem => item.Description)
+                    </td>*@
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Price)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Brand)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Stock)
+                        </td>
+                        <td>
+                            @(item.ReleaseDate?.ToString("dd MMM yyyy"))
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Category)
+                        </td>
+
+                        <td>
+                             <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-primary">
+                        <i class="fa fa-edit"></i> 
+                        </a>
+                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info">
+                        <i class="fa fa-eye"></i> 
+                        </a>
+                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger">
+                        <i class="fa fa-trash"></i> </a> 
+
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+

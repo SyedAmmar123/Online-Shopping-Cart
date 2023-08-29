@@ -1,0 +1,138 @@
+﻿@model Product
+@inject AppDbContext _context
+@{
+    ViewData["Title"] = "Edit";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var categories = new SelectList(_context.Categories.Where(m => m.Status && m.Type == CategoryType.Category).Select(m => new { m.Id, m.Name }).ToList(), "Id", "Name", Model?.CategoryId);
+    var brands = new SelectList(_context.Categories.Where(m => m.Status && m.Type == CategoryType.Brand).Select(m => new { m.Id, m.Name }).ToList(), "Id", "Name", Model?.BrandId);
+}
+
+<div id="productUpdateApp">
+    <form asp-action="Edit" enctype="multipart/form-data">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title">Edit Product</h4>
+                        <p class="card-description">
+                            Setup Section
+                        </p>
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <input type="hidden" asp-for="Id" />
+                        <div class="form-group">
+                            <label asp-for="Slug" class="control-label"></label>
+                            <input asp-for="Slug" class="form-control" />
+                            <span asp-validation-for="Slug" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Name" class="control-label"></label>
+                            <input asp-for="Name" class="form-control" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Description" class="control-label"></label>
+                            <input asp-for="Description" class="form-control" />
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Price" class="control-label"></label>
+                            <input asp-for="Price" class="form-control" />
+                            <span asp-validation-for="Price" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="BrandId" class="control-label"></label>
+                            <select asp-for="BrandId" class="form-control" asp-items="@brands">
+                                <option value="">Choose Brand</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="Stock" class="control-label"></label>
+                            <input asp-for="Stock" class="form-control" />
+                            <span asp-validation-for="Stock" class="text-danger"></span>
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="ReleaseDate" class="control-label"></label>
+                            <input asp-for="ReleaseDate" class="form-control" />
+                            <span asp-validation-for="ReleaseDate" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="CategoryId" class="control-label">Choose Category</label>
+                            <select asp-for="CategoryId" class="form-control" asp-items="@categories">
+                                <option value="">Choose Category</option>
+                            </select>
+                            <span asp-validation-for="CategoryId" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title">Product Images</h4>
+                        <p class="card-description">
+                            Product Existing Images
+                        </p>
+
+                        @*@if (Model.Images.Any())
+                        {
+                        <div class="row">
+                        @foreach (var image in Model.Images.OrderBy(m => m.Rank))
+                        {
+                        <div class="col-md-3">
+                        <img src="/@image.URL" class="img w-100" />
+                        Delete ? <input type="checkbox" name="DeletedImagesIds" value="@image.Id" />
+                        </div>
+                        }
+                        </div>
+                        }*@
+
+                        <div class="row">
+                            <div class="col-md-3" v-for="i in images.filter(m => !m.deleted)">
+                                <div>
+                                    <span class="fa fa-trash" @@click="i.deleted = true"></span>
+                                </div>
+                                <img :src="`/${i.url}`" class="img" style="width:100%" />
+                            </div>
+                        </div>
+
+                        <div class="row" v-if="images.filter(m => m.deleted).length">
+                            <p class="text-danger col-md-12">Following images will be deleted on update.</p>
+
+                            <div class="col-md-3" v-for="i in images.filter(m => m.deleted)">
+                                <div>
+                                    <span class="fa fa-trash" @@click="i.deleted = false"></span>
+                                </div>
+                                <img :src="`/${i.url}`" class="img" style="width:100%" />
+                                <input type="hidden" name="DeletedImagesIds" :value="i.id" />
+                            </div>
+                        </div>
+
+                        <div class="form-group mt-4">
+                            <label asp-for="Uploads" class="control-label"></label>
+                            <input asp-for="Uploads" type="file" multiple />
+                            <span asp-validation-for="Uploads" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <input type="submit" value="Update" class="btn btn-primary" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section js{
+    @await Html.PartialAsync("_ValidationScriptsPartial")
+    <script>
+        var productUpdateApp = Vue.createApp({
+            data() {
+                return {
+                    images: @Json.Serialize(Model.Images.OrderBy(m => m.Rank).Select(m => new { m.Id, m.URL, Deleted = false }))
+                }
+            }
+        }).mount('#productUpdateApp');
+    </script>
+}

@@ -1,0 +1,84 @@
+﻿@{
+    ViewData["Title"] = "Vue";
+    Layout = "_AdminLayout";
+}
+
+<!-- step 02 -->
+<div id="app2">
+    <div :class="v1+v2 > 100 ? 'bg-danger' : 'bg-success'">aaa</div>
+    <input v-model.number="v1" placeholder="Value 1" />
+    <input v-model.number="v2" placeholder="Value 2" />
+    
+    <input type="button" value="+" @@click="aOperation('+')" />
+    <input type="button" value="*" @@click="aOperation('*')" />
+    <input type="button" value="-" @@click="aOperation('-')" />
+    <input type="button" value="Clear" @@click="oType=''" />
+
+    @*<input type="button" value="+" @@click="oType = '+'" />
+    <input type="button" value="*" v-on:click="oType = '*'"  />
+    <input type="button" value="-" v-on:click="oType = '-'"  />
+    <input type="button" value="Clear" v-on:click="oType = ''"  />*@
+    
+    <div v-if="isLoading"><span class="fa fa-spin fa-spinner text-info"></span></div>
+
+    <h3 v-if="oType == '+'">Sum of {{v1}} and {{v2}} = {{result}}</h3>
+    <h3 v-else-if="oType == '*'">Multiply of {{v1}} and {{v2}} = {{result}}</h3>
+    <h3 v-else-if="oType == '-'">Difference of {{v1}} and {{v2}} = {{result}}</h3>
+    <h3 v-else>Waiting for button click</h3>
+    <input type="text" v-model="color" />
+    <div v-if="color" :style="{ backgroundColor: color }">Your favourite color is: {{color}}</div>
+</div>
+
+@section js{
+    <script>
+        var app = Vue.createApp({
+            data() {
+                return {
+                    v1:'',
+                    v2: '',
+                    result: '',
+                    oType: '',
+                    color: '',
+                    isLoading: ''
+                }
+            },
+            methods:{
+                aOperation(op){
+                    this.isLoading=true;
+                    setTimeout(function(){
+                        app.oType = op;
+                        if(op == '+'){
+                            app.result = app.v1 + app.v2;
+                        }else if(op == '-'){
+                            app.result = app.v1 - app.v2;
+                        }else if (op == '*') {
+                            app.result = app.v1 * app.v2;
+                        }
+                        app.isLoading = '';
+                    }, 2500);
+                }
+                //aOperation: () => {
+
+                //}
+            }
+        }).mount('#app2');
+    </script>
+}
+
+<!-- step 01-->
+@*
+    <div id="app1">
+    Your message is : {{msg}}
+</div>
+
+@section js{
+    <script>
+        var app = Vue.createApp({
+            data() {
+                return {
+                    msg: 'some message here'
+                }
+            }
+        }).mount('#app1');
+    </script>
+}*@
