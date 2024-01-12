@@ -62,6 +62,7 @@ namespace OnlineShoppingCart.Models
 
     public class ProductImage : ShareModel
     {
+        [ForeignKey("Product")]
         public string ProductId { get; set; }
         public Product Product { get; set; }
         public string URL { get; set; }

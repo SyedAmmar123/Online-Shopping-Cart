@@ -7,7 +7,7 @@
     var brands = new SelectList(_context.Categories.Where(m => m.Status && m.Type == CategoryType.Brand).Select(m => new { m.Id, m.Name }).ToList(), "Id", "Name", Model?.BrandId);
 }
 
-<div id="productUpdateApp">
+<div id="productUpdateApp" style="margin-left : 15px;">
     <form asp-action="Edit" enctype="multipart/form-data">
         <div class="row">
             <div class="col-md-6">

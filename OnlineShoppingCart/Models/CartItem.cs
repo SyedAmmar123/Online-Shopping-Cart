@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace OnlineShoppingCart.Models
 {
@@ -11,6 +12,7 @@ namespace OnlineShoppingCart.Models
         public ShoppingCart ShoppingCart { get; set; }
 
         [Required]
+        [ForeignKey("Product")]
         public string ProductId { get; set; }
 
         // Navigation property for the product in this cart item

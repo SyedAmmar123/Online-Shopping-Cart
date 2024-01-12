@@ -8,8 +8,8 @@ using System.Drawing;
 
 namespace OnlineShoppingCart.Controllers
 {
-   
-    [Authorized]
+
+    [Authorized/* (Roles = "Admin")*/]
     public class ProductsController : Controller
     {
         private readonly AppDbContext _context;
@@ -173,5 +173,52 @@ namespace OnlineShoppingCart.Controllers
             }
             return View(model);
         }
+        public async Task<IActionResult> Delete(string id)
+        {
+            if (id == null || _context.Products == null)
+            {
+                return NotFound();
+            }
+
+            var product = await _context.Products
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (product == null)
+            {
+                return NotFound();
+            }
+
+            return View(product);
+        }
+
+        [HttpPost, ActionName("Delete")]
+        //[ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(string id)
+        {
+            if (_context.Products == null)
+            {
+                return Problem("Entity set 'AppDbContext.Product' is null.");
+            }
+
+            var productImages = _context.ProductImages.Where(pi => pi.ProductId == id);
+
+            if (productImages.Any())
+            {
+                _context.ProductImages.RemoveRange(productImages);
+            }
+
+
+            var product = await _context.Products.FindAsync(id);
+
+            if (product == null)
+            {
+                return NotFound();
+            }
+
+            _context.Products.Remove(product);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Index));
+        }
+
     }
 }

@@ -7,7 +7,7 @@
     var brands = new SelectList(_context.Categories.Where(m => m.Status && m.Type == CategoryType.Brand).Select(m => new { m.Id, m.Name }).ToList(), "Id", "Name", Model?.BrandId);
 }
 
-<div class="row">
+<div class="row" style="margin-left : 15px;">
     <div class="col-md-6">
         <div class="card">
             <div class="card-body">
